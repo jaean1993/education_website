@@ -1,11 +1,12 @@
-<?php require_once('Connections/denglu.php'); ?>
+<?php require_once('Connections/connect.php'); ?>
 <?php
+mysqli_query($connect,"set names 'utf8'");
 if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($theValue, $theType, $connect, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
   $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysql_real_escape_string") ? mysqli_real_escape_string($connect,$theValue) : mysqli_escape_string($connect,$theValue);
 
   switch ($theType) {
     case "text":
@@ -35,18 +36,19 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
+  $pass=base64_encode($_POST['password']);
   $insertSQL = sprintf("INSERT INTO `admin` (username, password, truename, tel, email, question, answer, sex) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['username'], "text"),
-                       GetSQLValueString($_POST['password'], "text"),
-                       GetSQLValueString($_POST['truename'], "text"),
-                       GetSQLValueString($_POST['tel'], "text"),
-                       GetSQLValueString($_POST['email'], "text"),
-                       GetSQLValueString($_POST['question'], "text"),
-                       GetSQLValueString($_POST['answer'], "text"),
-                       GetSQLValueString($_POST['sex'], "text"));
+                       GetSQLValueString($_POST['username'], "text",$connect),
+                       GetSQLValueString($pass, "text",$connect),
+                       GetSQLValueString($_POST['truename'], "text",$connect),
+                       GetSQLValueString($_POST['tel'], "text",$connect),
+                       GetSQLValueString($_POST['email'], "text",$connect),
+                       GetSQLValueString($_POST['question'], "text",$connect),
+                       GetSQLValueString($_POST['answer'], "text",$connect),
+                       GetSQLValueString($_POST['sex'], "text",$connect));
 
-  mysql_select_db($database_denglu, $denglu);
-  $Result1 = mysql_query($insertSQL, $denglu) or die(mysql_error());
+  mysqli_select_db($connect,$database_connect );
+  $Result1 = mysqli_query($connect,$insertSQL) or die(mysql_error());
 
   $insertGoTo = "index.php";
   if (isset($_SERVER['QUERY_STRING'])) {
@@ -55,90 +57,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
   }
   header(sprintf("Location: %s", $insertGoTo));
 }
-?>
-<?php require_once('Connections/connect.php'); ?>
 
-<?php
-
-if (!function_exists("GetSQLValueString")) {
-
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-
-{
-
-  if (PHP_VERSION < 6) {
-
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-
-  }
-
-
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-
-
-  switch ($theType) {
-
-    case "text":
-
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-
-      break;    
-
-    case "long":
-
-    case "int":
-
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-
-      break;
-
-    case "double":
-
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-
-      break;
-
-    case "date":
-
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-
-      break;
-
-    case "defined":
-
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-
-      break;
-
-  }
-
-  return $theValue;
-
-}
-
-}
-
-
-
-$colname_Recordset1 = "-1";
-
-if (isset($_GET['news_id'])) {
-
-  $colname_Recordset1 = $_GET['news_id'];
-
-}
-
-mysql_select_db($database_connect, $connect);
-
-$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int"));
-
-$Recordset1 = mysql_query($query_Recordset1, $connect) or die(mysql_error());
-
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
-
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
 
 
 
@@ -152,13 +71,17 @@ if (isset($_GET['news_id'])) {
 
 
 
-mysql_select_db($database_connect, $connect);
+$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_type = 'common'");
 
-$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int"));
+$Recordset1 = mysqli_query( $connect,$query_Recordset1) or die(mysql_error());
 
-$Recordset1 = mysql_query($query_Recordset1, $connect) or die(mysql_error());
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
+
+
+
+
 
 ?>
 
@@ -166,17 +89,17 @@ $row_Recordset1 = mysql_fetch_assoc($Recordset1);
 
 <!-- saved from url=(0047)http://thechoose.phpnet.us/hushi2014070801.html -->
 
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 
 
-<title>½ÌÓı½»Á÷Ğ­»á</title>
+<title>æ•™è‚²äº¤æµåä¼š</title>
 
-<meta name="keywords" content="¸öÈËÁôÑ§Ö±Í¨³µ,ÖĞÈÕÈË²Å½»Á÷Ô®ÖúÆ½Ì¨,³ö¹ú£¬ÁôÑ§£¬ÁôÈÕ£¬ÈË²Å½»Á÷£¬Ô®ÖúÆ½Ì¨£¬ÅàÑµ£¬IPA£¬¶ÔÍâººÓï">
+<meta name="keywords" content="ä¸ªäººç•™å­¦ç›´é€šè½¦">
 
 <meta name="MSSmartTagsPreventParsing" content="TRUE">
 
-<meta name="description" content="¸öÈËÁôÑ§Ö±Í¨³µ,ÖĞÈÕÈË²Å½»Á÷Ô®ÖúÆ½Ì¨,³ö¹ú£¬ÁôÑ§£¬ÁôÈÕ£¬ÈË²Å½»Á÷£¬Ô®ÖúÆ½Ì¨£¬ÅàÑµ£¬IPA">
+<meta name="description" content="ä¸ªäººç•™å­¦ç›´é€šè½¦">
 
 <meta http-equiv="Page-Exit" content="revealTrans(Duration=1,Transition=23)">
 
@@ -210,7 +133,7 @@ function MM_validateForm() { //v4.0
 
 	val=document.getElementById(args[3]);val1=document.getElementById(args[6]);
 
-	if(val.value!=val1.value){nm=val.name;errors += '- '+nm+'Á½´ÎÃÜÂëÊäÈë²»Ò»ÖÂ£¬ÇëÖØĞÂÊäÈë£º\n';}
+	if(val.value!=val1.value){nm=val.name;errors += '- '+nm+'ä¸¤æ¬¡å¯†ç è¾“å…¥ä¸ä¸€è‡´\n';}
 
     for (i=0; i<(args.length-2); i+=3) { test=args[i+2]; val=document.getElementById(args[i]);
 
@@ -218,11 +141,11 @@ function MM_validateForm() { //v4.0
 
         if (test.indexOf('isEmail')!=-1) { p=val.indexOf('@');
 
-          if (p<1 || p==(val.length-1)) errors+='- '+nm+' ĞèÒªÊäÈëÓÊÏäµØÖ·.\n';
+          if (p<1 || p==(val.length-1)) errors+='- '+nm+' é‚®ç®±æ ¼å¼ä¸æ­£ç¡®.\n';
 
         } else if (test!='R') { num = parseFloat(val);
 
-          if (isNaN(val)) errors+='- '+nm+' must contain a number.\n';
+          if (isNaN(val)) errors+='- '+nm+' å¿…é¡»ä¸ºæ•°å­—.\n';
 
           if (test.indexOf('inRange') != -1) { p=test.indexOf(':');
 
@@ -336,27 +259,16 @@ function MM_validateForm() { //v4.0
 
     <ul class="nav clearfix">
 
-      <li class="nav-item"><a href="../index.php" tppabs="index.php">Ê×Ò³</a></li>
+   <li class="nav-item"><a href="../index.php" >é¦–é¡µ</a></li>
 
-      <li class="nav-item"><a href="newfang_user_admin.php" tppabs="xhdt.php">»áÔ±Ö®¼Ò</a></li>
+      <li class="nav-item"><a href="newfang_user_admin.php" >ä¼šå‘˜ä¹‹å®¶</a></li>
 
-      <li class="nav-item"><a href="../newfang_newslist.php" tppabs="huiyuan.php">ĞÂÎÅ¶¯Ì¬</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=news" >æ–°é—»åŠ¨æ€</a></li>
 
-      <li class="nav-item"><a href="../newfang_xueshulist.php" tppabs="report.php">Ñ§Êõ»î¶¯</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=academic" >å­¦æœ¯æ´»åŠ¨</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=members">ä¼šå‘˜åŠ¨æ€</a></li>
 
-      <li class="nav-item"></li>
-
-      <li class="nav-item"><a href="newfang_huiyuandongtailist.php" tppabs="dsj.php">»áÔ±¶¯Ì¬</a></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"><a href="../contect.php" tppabs="../contect.php">ÁªÏµÎÒÃÇ</a></li>
+      <li class="nav-item"><a href="../contect.php" >è”ç³»æˆ‘ä»¬</a></li>
 
     </ul>
 
@@ -376,7 +288,7 @@ function MM_validateForm() { //v4.0
 
 <table width="1004" border="0" align="center" cellpadding="0" cellspacing="0" background="../images1/index_zhenx_net_wasa_32.jpg" tppabs="images/index_zhenx_net_wasa_32.jpg">
 
-<form name="Search" method="post" action="javascript:if(confirm('search.asp  \n\n¸ÃÎÄ¼şÎ´±» Teleport Pro ÏÂÔØ£¬ÒòÎª ·şÎñÆ÷±¨¸æ - ÓÉÓÚ³öÏÖÒ»¸ö´íÎó¶øµ¼ÖÂÎŞ·¨ÏÂÔØ¡£  \n\nÄãÏëÒª´Ó·şÎñÆ÷´ò¿ªËüÂğ?'))window.location='search.asp'" tppabs="search.asp"></form>
+<form name="Search" method="post" action="javascript:if(confirm('search.asp  \n\nÂ¸ÃƒÃÃ„Â¼Ã¾ÃÂ´Â±Â» Teleport Pro ÃÃ‚Ã”Ã˜Â£Â¬Ã’Ã²ÃÂª Â·Ã¾ÃÃ±Ã†Ã·Â±Â¨Â¸Ã¦ - Ã“Ã‰Ã“ÃšÂ³Ã¶ÃÃ–Ã’Â»Â¸Ã¶Â´Ã­ÃÃ³Â¶Ã¸ÂµÂ¼Ã–Ã‚ÃÃÂ·Â¨ÃÃ‚Ã”Ã˜Â¡Â£  \n\nÃ„Ã£ÃÃ«Ã’ÂªÂ´Ã“Â·Ã¾ÃÃ±Ã†Ã·Â´Ã²Â¿ÂªÃ‹Ã¼Ã‚Ã°?'))window.location='search.asp'" tppabs="search.asp"></form>
 
 <tbody><tr>
 
@@ -388,11 +300,9 @@ function MM_validateForm() { //v4.0
 
 <marquee border="0" align="middle" scrolldelay="120" width="760">
 
-×ğ¾´µÄÀ´±öÄúºÃ£º
+å°Šæ•¬çš„æ¥å®¾æ‚¨å¥½ï¼š
 
-
-
-<a href="./index.php" target="_blank">»¶Ó­¹âÁÙ</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="./index.php" target="_blank">æ¬¢è¿å…‰ä¸´</a>&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 
@@ -432,49 +342,30 @@ function MM_validateForm() { //v4.0
 
   <tbody><tr>
 
-    <td width="183" valign="top"><table width="231" border="0" align="center" cellpadding="0" cellspacing="0">
+    <td width="183" valign="top"><table width="230" border="0" align="center" cellpadding="0" cellspacing="0">
 
       <tbody><tr>
 
         
-
-        <td width="186" background="../images1/a_003.gif" 
-
-            tppabs="http://www.wasa-china.com/images/a_003.gif"><span class="STYLE101">¹«¸æ</span></td>
-
-        <td width="43"><img src="../images1/a_004.gif" 
-
+        <td width="230" background="../images1/a_003.gif" 
+            tppabs="http://www.wasa-china.com/images/a_003.gif"><span class="STYLE101">å…¬å‘Š</span></td>
+        <td width="3"><img src="../images1/a_004.gif" 
                            tppabs="http://www.wasa-china.com/images/a_004.gif" width="6" height="28"></td>
-
-        <td width="3">&nbsp;</td>
-
+        
       </tr>
-
       <tr>
-
         <td colspan="3" valign="top" 
-
-            background="../images1/a_006.gif" 
-
             tppabs="http://www.wasa-china.com/images/a_006.gif">
-
             <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0">
-
                 <tbody><tr>
-
                   <td height="10"></td>
-
                 </tr>
 
-
-
                 <tr>
-
                   <td height="26" class="h25">
 
 
-
-               <table width="231" border="0" align="center" cellpadding="0" cellspacing="0">
+ <table width="231" border="0" align="center" cellpadding="0" cellspacing="0">
 
         <tbody><tr>
 
@@ -484,7 +375,7 @@ function MM_validateForm() { //v4.0
 
               <?php echo $row_Recordset1['news_title']; ?>
 
-              <?php } while ($row_Recordset1 = mysql_fetch_assoc($Recordset1)); ?></a></td>
+              <?php } while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1)); ?></a></td>
 
         </tr>
 
@@ -670,7 +561,7 @@ function MM_validateForm() { //v4.0
 
             <td width="14"><img src="../images1/a_012.gif" tppabs="http://www.wasa-china.com/images/a_012.gif" width="14" height="28"></td>
 
-            <td width="93" align="center" bgcolor="#4893D4"><strong>»áÔ±×¢²á</strong></td>
+            <td width="93" align="center" bgcolor="#4893D4"><strong>ç”¨æˆ·æ³¨å†Œ</strong></td>
 
             <td width="10"><img src="../images1/a_013.gif" tppabs="http://www.wasa-china.com/images/a_013.gif" width="9" height="28"></td>
 
@@ -696,7 +587,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÓÃ»§Ãû</td>
+      <td bgcolor="#FFFFFF">ç”¨æˆ·å</td>
 
       <td><label>
 
@@ -708,7 +599,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÃÜÂë</td>
+      <td bgcolor="#FFFFFF">å¯†ç </td>
 
       <td><label>
 
@@ -720,7 +611,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÔÙ´ÎÊäÈëÃÜÂë</td>
+      <td bgcolor="#FFFFFF">å†æ¬¡è¾“å…¥å¯†ç </td>
 
       <td><label>
 
@@ -732,7 +623,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ĞÕÃû</td>
+      <td bgcolor="#FFFFFF">å§“å</td>
 
       <td><label>
 
@@ -744,7 +635,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÁªÏµµç»°</td>
+      <td bgcolor="#FFFFFF">è”ç³»ç”µè¯</td>
 
       <td><label>
 
@@ -758,7 +649,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td width="383" bgcolor="#FFFFFF">µç×ÓÓÊÏä</td>
+      <td width="383" bgcolor="#FFFFFF">ç”µå­é‚®ç®±</td>
 
       <td width="388"><label for="textfield"></label>
 
@@ -772,7 +663,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÃÜÂëÕÒ»ØÎÊÌâ</td>
+      <td bgcolor="#FFFFFF">å¯†ç æ‰¾å›é—®é¢˜</td>
 
       <td><input type="text" name="question" id="question" /></td>
 
@@ -780,7 +671,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ÃÜÂëÕÒ»Ø´ğ°¸</td>
+      <td bgcolor="#FFFFFF">å¯†ç æ‰¾å›ç­”æ¡ˆ</td>
 
       <td><input type="text" name="answer" id="answer" /></td>
 
@@ -788,7 +679,7 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">ĞÔ±ğ</td>
+      <td bgcolor="#FFFFFF">æ€§åˆ«</td>
 
       <td><input type="text" name="sex" id="sex" /></td>
 
@@ -798,9 +689,9 @@ function MM_validateForm() { //v4.0
 
       <td colspan="2"><div align="center">
 
-        <input type="submit" name="Submit1" id="Submit1" value="Ìá½»"  onclick ='return checkpasswd()'/>
+        <input type="submit" name="Submit1" id="Submit1" value="æäº¤"  onclick ='return checkpasswd()'/>
 
-        <input type="reset" name="Submit2" id="Submit2" value="ÖØÖÃ" />
+        <input type="reset" name="Submit2" id="Submit2" value="é‡ç½®" />
 
       </div></td>
 
@@ -831,14 +722,6 @@ function MM_validateForm() { //v4.0
   </tr>
 
   <tr>
-
-
-
-
-
-
-
-
 
 
 
@@ -906,49 +789,7 @@ function MM_validateForm() { //v4.0
 
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!-- saved from url=(0039)http://thechoose.phpnet.us/xhdt.asp.htm -->
-
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
-
-
-
-<title>¸öÈËÁôÑ§Ö±Í¨³µ</title>
-
-<meta name="keywords" content="ÖĞÈÕÈË²Å½»Á÷Ô®ÖúÆ½Ì¨">
-
-<meta name="MSSmartTagsPreventParsing" content="TRUE">
-
-<meta name="description" content="ÖĞÈÕÈË²Å½»Á÷Ô®ÖúÆ½Ì¨">
-
-<meta http-equiv="Page-Exit" content="revealTrans(Duration=1,Transition=23)">
-
-<meta http-equiv="Page-Enter" content="revealTrans(Duration=1,Transition=23)">
-
-<link rel="shortcut icon" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-
-<link rel="Bookmark" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-
-<link href="../images1/css.css" tppabs="css/css.css" type="text/css" rel="stylesheet">
-
-<script type="text/javascript" src="../images1/swfobject.js" tppabs="fl/swfobject.js">
-
-</script>
-
-    <style type="text/css"></style>
-
-<script src="../images1/js.js" tppabs="js/js.js" type="text/javascript">
-
-</script>
-
-
-
-
-
-</head>
-
-<body>
 
 
 
@@ -964,7 +805,7 @@ function MM_validateForm() { //v4.0
 
     <td width="47" height="40" valign="middle">&nbsp;</td>
 
-    <td width="858" valign="middle"><span class="STYLE101">ÓÑÇéÁ´½Ó </span> | Links </td>
+    <td width="858" valign="middle"><span class="STYLE101">å‹æƒ…é“¾æ¥</span> | Links </td>
 
     <td width="95" align="center" valign="middle"></td>
 
@@ -990,7 +831,7 @@ function MM_validateForm() { //v4.0
 
           <tbody><tr>
 
-            <td width="114" align="center"><a class="flink" href="http://www.jllx.cn/">ÖĞ»ªÈËÃñ¹²ºÍ¹ú½ÌÓı²¿</a></td>
+            <td width="114" align="center"><a class="flink" href="http://www.jllx.cn/">ä¸­åäººæ°‘å…±å’Œå›½æ•™è‚²éƒ¨</a></td>
 
           </tr>
 
@@ -1002,7 +843,7 @@ function MM_validateForm() { //v4.0
 
           <tbody><tr>
 
-            <td width="114" align="center"><a class="flink" href="http://ddzyzg.neu.edu.cn/">ÖĞ»ªÈËÃñ¹²ºÍ¹úÍâ½»²¿</a></td>
+            <td width="114" align="center"><a class="flink" href="http://ddzyzg.neu.edu.cn/">ä¸­åäººæ°‘å…±å’Œå›½å¤–äº¤éƒ¨</a></td>
 
           </tr>
 
@@ -1014,7 +855,7 @@ function MM_validateForm() { //v4.0
 
           <tbody><tr>
 
-            <td width="114" align="center"><a class = "flink" href="http://shop115478731.taobao.com/">ÖĞ»ªÈËÃñ¹²ºÍ¹úÃñÕş²¿</a></td>
+            <td width="114" align="center"><a class = "flink" href="http://shop115478731.taobao.com/">ä¸­åäººæ°‘å…±å’Œå›½æ°‘æ”¿éƒ¨</a></td>
 
           </tr>
 
@@ -1066,7 +907,7 @@ function MM_validateForm() { //v4.0
 
   <tr>
 
-    <td height="75" valign="middle" style="text-align:center;">°æÈ¨ËùÓĞ &#169;»ªÀíÑ§×Ó<br>        
+    <td height="75" valign="middle" style="text-align:center;">ç‰ˆæƒæ‰€æœ‰ &#169;åç†å­¦å­<br>        
 
       <br>
 
@@ -1088,7 +929,7 @@ function MM_validateForm() { //v4.0
 
 <?php
 
-mysql_free_result($Recordset1);
+mysqli_free_result($Recordset1);
 
 ?>
 

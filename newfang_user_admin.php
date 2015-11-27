@@ -44,32 +44,44 @@ $loginFormAction = $_SERVER['PHP_SELF'];
 }*/
 
 if (isset($_POST['textfield'])) {
+
   $loginUsername=$_POST['textfield'];
   $password=$_POST['textfield2'];
   $MM_fldUserAuthorization = "authority";
-  $MM_redirectLoginSuccess = "newfang_guanliyuandenglu.php";
+  $MM_redirectLoginSuccess_1 = "newfang_guanliyuandenglu.php";
+  $MM_redirectLoginSuccess_2 = "newfang_userhome.php";
   $MM_redirectLoginFailed = "newfang_user_admin.php?type=check";
   $MM_redirecttoReferrer = false;
   mysqli_select_db( $connect,$database_connect);
   	
-  $LoginRS__query=sprintf("SELECT username, password, authority FROM `admin` WHERE username=%s AND password=%s",
-  GetSQLValueString($loginUsername, "text",$connect), GetSQLValueString($password, "text",$connect)); 
+  $LoginRS__query=sprintf("SELECT username, password, authority FROM `admin` WHERE username=%s ",
+  GetSQLValueString($loginUsername, "text",$connect)); 
    
   $LoginRS = mysqli_query($connect,$LoginRS__query) or die(mysql_error());
-  $loginFoundUser = mysqli_num_rows($LoginRS);
+  $loginStrGroup  = mysqli_fetch_assoc($LoginRS);
+  $loginFoundUser=false;
+  if($loginStrGroup){
+    $rel_pass=base64_decode($loginStrGroup['password']);
+    if($rel_pass==$password){
+      $loginFoundUser=true;
+    }
+  }
 
   if ($loginFoundUser) {
-
-    $loginStrGroup  = mysqli_fetch_assoc($LoginRS);
-   
     
     $_SESSION['MM_Username'] = $loginUsername;
     $_SESSION['MM_UserGroup'] = $loginStrGroup;	      
     
-    if (isset($_SESSION['PrevUrl']) && false) {
+    /*if (isset($_SESSION['PrevUrl']) && false) {
       $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
+    }*/
+    if($loginStrGroup['authority']==0){
+      header("Location: " . $MM_redirectLoginSuccess_2);
+    }else if($loginStrGroup['authority']==1){
+      header("Location: " . $MM_redirectLoginSuccess_1 );
+    }else {
+       header("Location: ". $MM_redirectLoginFailed );
     }
-    header("Location: " . $MM_redirectLoginSuccess );
   }
   else {
     header("Location: ". $MM_redirectLoginFailed );
@@ -210,27 +222,16 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
     <ul class="nav clearfix">
 
-      <li class="nav-item"><a href="../newfang.php" tppabs="index.php">首页</a></li>
+   <li class="nav-item"><a href="../index.php" >首页</a></li>
 
-      <li class="nav-item"><a href="newfang_user_admin.php" tppabs="xhdt.php">会员之家</a></li>
+      <li class="nav-item"><a href="newfang_user_admin.php" >会员之家</a></li>
 
-      <li class="nav-item"><a href="../newfang_newslist.php" tppabs="huiyuan.php">新闻动态</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=news" >新闻动态</a></li>
 
-      <li class="nav-item"><a href="../newfang_xueshulist.php" tppabs="report.php">学术活动</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=academic" >学术活动</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=members">会员动态</a></li>
 
-      <li class="nav-item"></li>
-
-      <li class="nav-item"><a href="newfang_huiyuandongtailist.php" tppabs="dsj.php">会员动态</a></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"></li>
-
-      <li class="nav-item"><a href="../contect.php" tppabs="../contect.php">联系我们</a></li>
+      <li class="nav-item"><a href="../contect.php" >联系我们</a></li>
 
     </ul>
 
@@ -336,7 +337,7 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
           <td width="231"><a href="newfang_news.php?news_id=<?php echo $row_Recordset1['news_id']; ?>"> <?php echo $row_Recordset1['news_title']; ?>
-              <?php } while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1)); ?></a></td>
+              <?php } while ($row_Recordset2 = mysqli_fetch_assoc($Recordset1)); ?></a></td>
         </tr>
 </tbody></table>
 

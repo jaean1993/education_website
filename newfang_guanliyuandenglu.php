@@ -4,17 +4,16 @@ mysqli_query($connect,"set names 'utf8'");
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "1";
+
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
-function isAuthorized( $strGroups, $UserName, $UserGroup) { 
+function isAuthorized(  $UserName, $UserGroup) { 
   // For security, start by assuming the visitor is NOT authorized. 
   $isValid = False; 
   // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
   // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
   if (!empty($UserGroup)) { 
-    
     if ($UserGroup['authority']==1) { 
       $isValid = true; 
     } 
@@ -25,7 +24,7 @@ function isAuthorized( $strGroups, $UserName, $UserGroup) {
 
 $MM_restrictGoTo = "newfang_user_admin.php";
 
-if (!((isset($_SESSION['MM_Username'])) && (isAuthorized($MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
+if (!((isset($_SESSION['MM_Username'])) && ( $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
   if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
@@ -137,17 +136,16 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
   <td height="65" colspan="2" align="left" valign="middle">
     <ul class="nav clearfix">
-      <li class="nav-item"><a href="../index.php" tppabs="index.php">首页</a></li>
-      <li class="nav-item"><a href="newfang_user_admin.php" tppabs="xhdt.php">会员之家</a></li>
-      <li class="nav-item"><a href="../newfang_newslist.php" tppabs="huiyuan.php">新闻动态</a></li>
-      <li class="nav-item"><a href="../newfang_xueshulist.php" tppabs="report.php">学术活动</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="newfang_huiyuandongtailist.php" tppabs="dsj.php">会员动态</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="../contect.php" tppabs="../contect.php">联系我们</a></li>
+   <li class="nav-item"><a href="../index.php" >首页</a></li>
+
+      <li class="nav-item"><a href="newfang_user_admin.php" >会员之家</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=news" >新闻动态</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=academic" >学术活动</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=members">会员动态</a></li>
+
+      <li class="nav-item"><a href="../contect.php" >联系我们</a></li>
     </ul>
   </td>
 </tr>

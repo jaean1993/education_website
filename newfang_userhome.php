@@ -99,17 +99,16 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
   <td height="65" colspan="2" align="left" valign="middle">
     <ul class="nav clearfix">
-      <li class="nav-item"><a href="../index.php" tppabs="index.php">首页</a></li>
-      <li class="nav-item"><a href="newfang_userhome.php" tppabs="xhdt.php">会员之家</a></li>
-      <li class="nav-item"><a href="../newfang_newslist.php" tppabs="huiyuan.php">新闻动态</a></li>
-      <li class="nav-item"><a href="../newfang_xueshulist.php" tppabs="report.php">学术活动</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="newfang_huiyuandongtailist.php" tppabs="dsj.php">会员动态</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="../contect.php" tppabs="../contect.php">联系我们</a></li>
+   <li class="nav-item"><a href="../index.php" >首页</a></li>
+
+      <li class="nav-item"><a href="newfang_user_admin.php" >会员之家</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=news" >新闻动态</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=academic" >学术活动</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=members">会员动态</a></li>
+
+      <li class="nav-item"><a href="../contect.php" >联系我们</a></li>
     </ul>
   </td>
 </tr>
