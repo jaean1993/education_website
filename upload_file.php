@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=gbk" />
+	<title>Upload an Image</title>
+	<style type="text/css" title="text/css" media="all">
+	.error {
+		font-weight: bold;
+		color: #C00;
+	}
+	</style>
+</head>
+<body>
+<?php # Script 11.2 - upload_image.php
+
+// Check if the form has been submitted:
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+	// Check for an uploaded file:
+	if (isset($_FILES['upload'])) {
+		
+		// Validate the type. Should be JPEG or PNG.
+		$allowed = array ('image/pjpeg', 
+ 'image/gif', 
+ 'image/jpeg', 
+ 'image/jpeg', 
+ 'image/jpeg', 
+ 'text/plain', 
+ 'text/xml',
+ 'text/tex', 
+ 'audio/mpeg', 
+ 'video/mpeg', 
+ 'application/zip', 
+ 'application/x-rar-compressed', 
+ 'application/msword', 
+ 'application/octet-stream'     
+
+ 
+);
+		if (in_array($_FILES['upload']['type'], $allowed)) {
+		
+			// Move the file over.
+			if (move_uploaded_file ($_FILES['upload']['tmp_name'],iconv("UTF-8", "gb2312","download/{$_FILES['upload']['name']}"))) {
+				echo '<p><em>文件上传成功</em></p>';
+			} // End of move... IF.
+			
+		}
+
+	} // End of isset($_FILES['upload']) IF.
+	
+	// Check for an error:
+	if ($_FILES['upload']['error'] > 0) {
+		echo '<p class="error">The file could not be uploaded because: <strong>';
+	
+		// Print a message based upon the error.
+		switch ($_FILES['upload']['error']) {
+			case 1:
+				print 'The file exceeds the upload_max_filesize setting in php.ini.';
+				break;
+			case 2:
+				print 'The file exceeds the MAX_FILE_SIZE setting in the HTML form.';
+				break;
+			case 3:
+				print 'The file was only partially uploaded.';
+				break;
+			case 4:
+				print 'No file was uploaded.';
+				break;
+			case 6:
+				print 'No temporary folder was available.';
+				break;
+			case 7:
+				print 'Unable to write to the disk.';
+				break;
+			case 8:
+				print 'File upload stopped.';
+				break;
+			default:
+				print 'A system error occurred.';
+				break;
+		} // End of switch.
+		
+		print '</strong></p>';
+	
+	} // End of error IF.
+	
+	// Delete the file if it still exists:
+	if (file_exists ($_FILES['upload']['tmp_name']) && is_file($_FILES['upload']['tmp_name']) ) {
+		unlink ($_FILES['upload']['tmp_name']);
+	}
+			
+} // End of the submitted conditional.
+?>
+	
+<form enctype="multipart/form-data" action="upload_file.php" method="post">
+
+	<input type="hidden" name="MAX_FILE_SIZE" value="99999999" />
+	
+	<fieldset><legend>Select a file to be uploaded:</legend>
+	
+	<p><b>File:</b> <input type="file" name="upload" /></p>
+	
+	</fieldset>
+	<div align="center"><input type="submit" name="submit" value="提交" /></div>
+
+</form>
+</body>
+</html>
