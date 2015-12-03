@@ -31,6 +31,15 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+if (!isset($_SESSION)) {
+  session_start();
+}
+//用户登出
+if(isset($_GET['action'])){
+  if($_GET['action']=='logout'){
+    session_unset();
+  }
+}
 $maxRows_Recordset = 3;
 $pageNum_Recordset = 0;
 if (isset($_GET['pageNum_Recordset1'])) {
@@ -161,6 +170,22 @@ $(function(){
 
 </object>
 </td>
+<td align="right" valign="middle">
+  <table width="25%" border="0" cellspacing="0" cellpadding="0">
+    <tbody><tr>
+         
+<?php
+    if(!empty($_SESSION)){
+      echo '<a href="newfang_userhome.php">';
+      echo "您好".$_SESSION['MM_Username']."</a>";
+      echo '&nbsp;&nbsp;&nbsp;<a href="" onclick="logout()" id="log_out" name="log_out">退出登录</a>';
+    }else{
+      echo '<a href="newfang_user_admin.php">点此登录</a>';
+    }
+?>
+    
+      </tr>
+  </tbody></table>  </td>
 </tr>
 
 <tr>
@@ -1496,7 +1521,13 @@ demo.onmouseout=function() {MyMar1=setInterval(Marquee1,Picspeed)}
   </tr>
 
 </tbody></table>
+<script type="text/javascript">
+function logout(){
 
+  alert("已退出登录!");
+    window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?action=logout"'; ?>;
+}
+</script>
 </body></html>
 <?php
 mysqli_free_result($Recordset1);

@@ -34,10 +34,9 @@ $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
-
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
   $pass=base64_encode($_POST['password']);
-  $insertSQL = sprintf("INSERT INTO `admin` (username, password, truename, tel, email, question, answer, sex) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+  $insertSQL = sprintf("INSERT INTO `admin` (username, password, truename, tel, email, question, answer, sex,authority) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%d)",
                        GetSQLValueString($_POST['username'], "text",$connect),
                        GetSQLValueString($pass, "text",$connect),
                        GetSQLValueString($_POST['truename'], "text",$connect),
@@ -45,28 +44,20 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
                        GetSQLValueString($_POST['email'], "text",$connect),
                        GetSQLValueString($_POST['question'], "text",$connect),
                        GetSQLValueString($_POST['answer'], "text",$connect),
-                       GetSQLValueString($_POST['sex'], "text",$connect));
-
+                       GetSQLValueString($_POST['sex'], "text",$connect),
+                       0
+                       );
+ 
+  
   mysqli_select_db($connect,$database_connect );
   $Result1 = mysqli_query($connect,$insertSQL) or die(mysql_error());
 
-  $insertGoTo = "index.php";
+  $insertGoTo = "newfang_user_admin.php";
   if (isset($_SERVER['QUERY_STRING'])) {
     $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
     $insertGoTo .= $_SERVER['QUERY_STRING'];
   }
   header(sprintf("Location: %s", $insertGoTo));
-}
-
-
-
-
-$colname_Recordset1 = "-1";
-
-if (isset($_GET['news_id'])) {
-
-  $colname_Recordset1 = $_GET['news_id'];
-
 }
 
 
@@ -78,10 +69,6 @@ $Recordset1 = mysqli_query( $connect,$query_Recordset1) or die(mysql_error());
 $row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 
 $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
-
-
-
-
 
 ?>
 
@@ -684,7 +671,7 @@ function MM_validateForm() { //v4.0
       <td><input type="text" name="sex" id="sex" /></td>
 
     </tr>
-
+    
     <tr bgcolor="#FFFFFF">
 
       <td colspan="2"><div align="center">

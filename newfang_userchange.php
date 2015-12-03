@@ -31,24 +31,8 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
-$colname_Recordset1 = "-1";
-if (isset($_GET['news_id'])) {
-  $colname_Recordset1 = $_GET['news_id'];
-}
-mysql_select_db($database_connect, $connect);
-$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int"));
-$Recordset1 = mysql_query($query_Recordset1, $connect) or die(mysql_error());
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
 
-$colname_Recordset1 = "-1";
-if (isset($_GET['news_id'])) {
-  $colname_Recordset1 = $_GET['news_id'];
-}
-mysql_select_db($database_connect, $connect);
-$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int"));
-$Recordset1 = mysql_query($query_Recordset1, $connect) or die(mysql_error());
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- saved from url=(0047)http://thechoose.phpnet.us/hushi2014070801.html -->
@@ -99,30 +83,7 @@ $row_Recordset1 = mysql_fetch_assoc($Recordset1);
     <tbody><tr>     
      
      
-      
-    <!--QQ代码开始-->  
-      <td width="15%">
-        
-          
-           <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=2993303244&amp;site=qq&amp;menu=yes">
-                  <img border="0" src="http://wpa.qq.com/pa?p=2:2993303244:42" 
-                       alt="夏老师2" title="咨询老师1"width="70" hspace="10" height="20" align="right" />
-          </a>
-      </td>
-    <td width="15%">
-          <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=1751943594&amp;site=qq&amp;menu=yes">
-                  <img border="0" src="http://wpa.qq.com/pa?p=2:1751943594:41" 
-                       alt="孙老师2" title="咨询老师2"width="70" hspace="10" height="20" align="right" />
-          </a>          
-      </td>
-    <td width="15%">
-          <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=1160380612&amp;site=qq&amp;menu=yes">
-              <img border="0" src="http://wpa.qq.com/pa?p=2:1160380612:41" 
-                   alt="夏老师3" title="咨询老师3"width="70" hspace="10" height="20" align="right" />
-          </a>           
-      </td>
-    
-    <!--QQ代码结束-->
+
     
     
     </td>

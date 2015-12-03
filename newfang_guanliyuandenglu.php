@@ -5,10 +5,10 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
-$MM_donotCheckaccess = "false";
+//$MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
-function isAuthorized(  $UserName, $UserGroup) { 
+function isAuthorized($UserName, $UserGroup) { 
   // For security, start by assuming the visitor is NOT authorized. 
   $isValid = False; 
   // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
@@ -24,7 +24,7 @@ function isAuthorized(  $UserName, $UserGroup) {
 
 $MM_restrictGoTo = "newfang_user_admin.php";
 
-if (!((isset($_SESSION['MM_Username'])) && ( $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
+if (!((isset($_SESSION['MM_Username'])) && isAuthorized( $_SESSION['MM_Username'], $_SESSION['MM_UserGroup']))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
   if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";

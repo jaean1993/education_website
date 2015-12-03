@@ -1,45 +1,48 @@
 <?php require_once('Connections/connect.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType,$connect, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
+if (!isset($_SESSION)) {
+  session_start();
+}
+//用户登出
+if(isset($_GET['action'])){
+  if($_GET['action']=='logout'){
+    session_unset();
   }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysqli_real_escape_string($connect,$theValue) : mysqli_escape_string($connect,$theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
 }
 
-$colname_Recordset1 = "-1";
-if (isset($_GET['news_id'])) {
-  $colname_Recordset1 = $_GET['news_id'];
+$MM_redirectLoginFailed1="newfang_user_admin.php";
+$MM_redirectLoginFailed2="newfang_guanliyuandenglu.php";
+//防止直接登入
+if(!$_SESSION['MM_Username']||!$_SESSION['MM_UserGroup']){
+  header("Location: ". $MM_redirectLoginFailed1 );
 }
-mysqli_select_db($connect,$database_connect);
-$query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int",$connect));
-$Recordset1 = mysqli_query( $connect,$query_Recordset1) or die(mysql_error());
-$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
+
+//防止管理员进入
+function isAuthorized( $UserName, $UserGroup) { 
+
+  $isValid = False; 
+  if (!empty($UserGroup)) { 
+    if ($UserGroup['authority']==1) { 
+      $isValid = true; 
+    } 
+   
+  } 
+  return $isValid; 
+}
+if(isAuthorized($_SESSION['MM_Username'],$_SESSION['MM_UserGroup'])){
+  header("Location: ".$MM_redirectLoginFailed2);
+}
+
+//get data from the database of user's informaiton
+mysqli_query($connect,"set names 'gbk'");
+mysqli_select_db( $connect,$database_connect);
+$id_quest=sprintf("SELECT id,username FROM admin  WHERE username='".$_SESSION['MM_Username']."' AND password='".$_SESSION['MM_UserGroup']['password']."'");
+$id_set = mysqli_query($connect,$id_quest) or die(mysql_error());
+$id=mysqli_fetch_assoc($id_set);
+
+
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- saved from url=(0047)http://thechoose.phpnet.us/hushi2014070801.html -->
@@ -88,10 +91,18 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 <td align="right" valign="middle">
   <table width="25%" border="0" cellspacing="0" cellpadding="0">
-    <tbody><tr>     
-     
+    <tbody><tr>
+         
+<?php
+    if(isset($id)){
+      echo '<a href="newfang_userhome.php">';
+      echo "您好".$id['username']."</a>";
+      echo '&nbsp;&nbsp;&nbsp;<a href="" onclick="logout()" id="log_out" name="log_out">退出登录</a>';
+    }else{
+      echo '<a href="newfang_user_admin.php">点此登录</a>';
+    }
+?>
     
-    </td>
       </tr>
   </tbody></table>  </td>
 </tr>
@@ -118,7 +129,7 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 <table width="1004" border="0" align="center" cellpadding="0" cellspacing="0" background="../images1/index_zhenx_net_wasa_32.jpg" tppabs="images/index_zhenx_net_wasa_32.jpg">
-<form name="Search" method="post" action="javascript:if(confirm('search.asp  \n\n该文件未被 Teleport Pro 下载，因为 服务器报告 - 由于出现一个错误而导致无法下载。  \n\n你想要从服务器打开它吗?'))window.location='search.asp'" tppabs="search.asp"></form>
+
 <tbody><tr>
 <td width="38" height="32" valign="middle">&nbsp;</td>
 <td valign="middle" width="760">
@@ -340,28 +351,7 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
   </tr>
 </tbody></table>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0039)http://thechoose.phpnet.us/xhdt.asp.htm -->
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
 
-<title>个人留学直通车</title>
-<meta name="keywords" content="中日人才交流援助平台">
-<meta name="MSSmartTagsPreventParsing" content="TRUE">
-<meta name="description" content="中日人才交流援助平台">
-<meta http-equiv="Page-Exit" content="revealTrans(Duration=1,Transition=23)">
-<meta http-equiv="Page-Enter" content="revealTrans(Duration=1,Transition=23)">
-<link rel="shortcut icon" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-<link rel="Bookmark" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-<link href="../images1/css.css" tppabs="css/css.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="../images1/swfobject.js" tppabs="fl/swfobject.js">
-</script>
-    <style type="text/css"></style>
-<script src="../images1/js.js" tppabs="js/js.js" type="text/javascript">
-</script>
-
-
-</head>
-<body>
 
 
 <table width="1000" height="47" border="0" align="center" cellpadding="0" cellspacing="0" 
@@ -426,9 +416,15 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
   </tr>
 </tbody></table>
 <script type="text/javascript">
+
 swfobject.registerObject("FlashID");
+
+function logout(){
+  console.log('123');
+  alert("已退出登录!");
+  window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?action=logout"'; ?>;
+}
 </script>
+
 </body></html>
-<?php
-mysqli_free_result($Recordset1);
-?>
+

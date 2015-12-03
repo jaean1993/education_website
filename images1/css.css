@@ -736,3 +736,20 @@ DIV.green-black SPAN.current {
 DIV.green-black SPAN.disabled {
 	BOR}
 
+.article_title h1 {
+    display: inline;
+    font: normal 20px/30px 'Microsoft YaHei';
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    font-stretch: normal;
+    font-size: 20px;
+    line-height: 30px;
+    font-family: 'Microsoft YaHei';
+    vertical-align: middle;
+}
+.review_title {
+      font-size: 16px;
+      font: normal 20px/30px 'Microsoft YaHei';
+    
+}
