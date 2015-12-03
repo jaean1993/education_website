@@ -54,7 +54,7 @@ if (isset($_POST['textfield'])) {
   $MM_redirecttoReferrer = false;
   mysqli_select_db( $connect,$database_connect);
   	
-  $LoginRS__query=sprintf("SELECT username, password, authority FROM `admin` WHERE username=%s ",
+  $LoginRS__query=sprintf("SELECT username, password, authority,id FROM `admin` WHERE username=%s ",
   GetSQLValueString($loginUsername, "text",$connect)); 
    
   $LoginRS = mysqli_query($connect,$LoginRS__query) or die(mysql_error());

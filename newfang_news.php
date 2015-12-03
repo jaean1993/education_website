@@ -5,7 +5,6 @@
 mysqli_query($connect,"set names 'utf8'");
 
 if (!function_exists("GetSQLValueString")) {
-  global $connect;
 function GetSQLValueString($theValue, $theType, $connect,$theDefinedValue = "", $theNotDefinedValue = "") 
 {
 
@@ -67,6 +66,35 @@ $query_Recordset3=sprintf("SELECT * FROM newsreview WHERE news_id=%s ORDER BY id
 $Recordset3 = mysqli_query($connect,$query_Recordset3) or die(mysql_error());
 $row_Recordset3=mysqli_fetch_assoc($Recordset3);
 $totalRows_Recordset3 = mysqli_num_rows($Recordset3);
+//add review
+
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
+
+if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
+
+  $insertSQL = sprintf("INSERT INTO newsreview (news_id, user_id, content,user_name,rdate) VALUES (%s, %s, %s,%s,%s)",
+                       GetSQLValueString($_GET['news_id'], "int",$connect),
+                       GetSQLValueString($_SESSION['MM_UserGroup']['id'], "int",$connect),
+                       GetSQLValueString($_POST['content'], "text",$connect),
+                       GetSQLValueString($_SESSION['MM_Username'],"text",$connect),
+                       GetSQLValueString(date("Y/m/d"),"text",$connect));
+
+  mysqli_select_db($connect,$database_connect);
+  $Result1 = mysqli_query($connect,$insertSQL) or die(mysql_error());
+  if(!$Result1){
+    echo '<script type="text/javascript" >
+
+        alert("评论失败！");
+
+        </script>';
+  }else{
+
+  header(sprintf("Location: %s", $editFormAction));
+  }
+}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -556,7 +584,7 @@ $(function(){
       <tr >
       <td align="left" ><?php echo $row_Recordset3['content'];?></td>
           <td align="left">By:<?php echo $row_Recordset3['user_name'];?>&nbsp;&nbsp;</td>
-           <td align="left">@<?php echo $row_Recordset3['date'];?></td>
+           <td align="left">@<?php echo $row_Recordset3['rdate'];?></td>
         </tr>
         <br>
       <?php } while ($row_Recordset3= mysqli_fetch_assoc($Recordset3)); ?>   
@@ -570,7 +598,7 @@ $(function(){
     <td align="left">
 
       <div>
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" name="form" method="POST">
+        <form action="<?php echo $editFormAction; ?>" name="form" method="POST">
           <textarea name="content" id="container">这里写你的初始化内容</textarea>
          <input type="submit" name="button" id="button" value="提交">
 <input type="hidden" name="MM_insert" value="form">

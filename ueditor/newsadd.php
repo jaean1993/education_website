@@ -38,10 +38,10 @@ if (isset($_SERVER['QUERY_STRING'])) {
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
 
   $insertSQL = sprintf("INSERT INTO news (news_title, news_content, news_author,news_type) VALUES (%s, %s, %s,%s)",
-                       GetSQLValueString($_POST['title'], "text"),
-                       GetSQLValueString($_POST['content'], "text"),
-                       GetSQLValueString($_POST['author'], "text"),
-                       GetSQLValueString($_POST['type'],"text"));
+                       GetSQLValueString($_POST['title'], "text",$connect),
+                       GetSQLValueString($_POST['content'], "text",$connect),
+                       GetSQLValueString($_POST['author'], "text",$connect),
+                       GetSQLValueString($_POST['type'],"text"),$connect);
 
   mysqli_select_db($connect,$database_connect);
   $Result1 = mysqli_query($connect,$insertSQL) or die(mysql_error());

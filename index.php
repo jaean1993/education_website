@@ -1,6 +1,7 @@
 ﻿<?php require_once('Connections/connect.php'); ?>
 
 <?php
+
 mysqli_query($connect,"set names 'utf8'");
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
@@ -34,10 +35,14 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 if (!isset($_SESSION)) {
   session_start();
 }
+
+
 //用户登出
 if(isset($_GET['action'])){
   if($_GET['action']=='logout'){
+
     session_unset();
+    session_destroy();
   }
 }
 $maxRows_Recordset = 3;
