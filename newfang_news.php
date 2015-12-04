@@ -3,7 +3,7 @@
 ?>
 <?php
 mysqli_query($connect,"set names 'utf8'");
-
+mysqli_select_db( $connect,$database_connect);
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $connect,$theDefinedValue = "", $theNotDefinedValue = "") 
 {
@@ -43,14 +43,10 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
-//用户登出
-if(isset($_GET['action'])){
-  if($_GET['action']=='logout'){
-    session_unset();
-  }
-}
+
+
 //news
-mysqli_select_db( $connect,$database_connect);
+
 $query_Recordset1 = sprintf("SELECT * FROM news WHERE news_id = %s", GetSQLValueString($colname_Recordset1, "int",$connect));
 $Recordset1 = mysqli_query($connect,$query_Recordset1 ) or die(mysql_error());
 $row_Recordset1 = mysqli_fetch_assoc($Recordset1);
@@ -66,7 +62,26 @@ $query_Recordset3=sprintf("SELECT * FROM newsreview WHERE news_id=%s ORDER BY id
 $Recordset3 = mysqli_query($connect,$query_Recordset3) or die(mysql_error());
 $row_Recordset3=mysqli_fetch_assoc($Recordset3);
 $totalRows_Recordset3 = mysqli_num_rows($Recordset3);
-//add review
+
+//用户登出
+if(isset($_GET['action'])){
+ 
+  if($_GET['action']=='logout'){
+    session_unset();
+  }
+  if($_GET['action']=='collect'){
+      $insertSQL = sprintf("INSERT INTO `collection` ( news_id, user_id, news_title ) VALUES (%s, %s, %s)",
+                       
+                       GetSQLValueString($colname_Recordset1, "text",$connect),
+                       GetSQLValueString($_SESSION['MM_UserGroup']['id'], "text",$connect),
+                       GetSQLValueString($row_Recordset2['news_title'], "text",$connect)
+                       
+                       );
+    $insert_result = mysqli_query($connect,$insertSQL ) or die(mysql_error());
+  
+   
+  }
+}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -75,7 +90,8 @@ if (isset($_SERVER['QUERY_STRING'])) {
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
 
-  $insertSQL = sprintf("INSERT INTO newsreview (news_id, user_id, content,user_name,rdate) VALUES (%s, %s, %s,%s,%s)",
+  $insertSQL = sprintf("INSERT INTO newsreview (news_title,news_id, user_id, content,user_name,rdate) VALUES (%s,%s, %s, %s,%s,%s)",
+                        GetSQLValueString($row_Recordset2['news_title'], "text",$connect),
                        GetSQLValueString($_GET['news_id'], "int",$connect),
                        GetSQLValueString($_SESSION['MM_UserGroup']['id'], "int",$connect),
                        GetSQLValueString($_POST['content'], "text",$connect),
@@ -592,6 +608,7 @@ $(function(){
       <tr><td>&nbsp;</td></tr>
       <tr><td>&nbsp;</td></tr>
       <tr><td>&nbsp;</td></tr>
+      <tr><td align="right"><button id="collect" name="collect" onclick="collect()">收藏此文章</button></td></tr>
       <tr><td>&nbsp;</td></tr>
   <tr>
 
@@ -779,6 +796,10 @@ $(function(){
 
 
 <script type="text/javascript">
+function collect(){
+  alert("收藏成功!");
+  window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'&action=collect"'; ?>;
+}
 function logout(){
 
   alert("已退出登录!");

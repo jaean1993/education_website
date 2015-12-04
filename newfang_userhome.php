@@ -5,6 +5,7 @@ mysqli_select_db( $connect,$database_connect);
 if (!isset($_SESSION)) {
   session_start();
 }
+
 $delete_set=False;
 $MM_redirectLoginFailed1="newfang_user_admin.php";
 $MM_redirectLoginFailed2="newfang_guanliyuandenglu.php";
@@ -115,7 +116,7 @@ $id=mysqli_fetch_assoc($id_set);
       echo '<a href="newfang_userhome.php">';
       echo "您好".$id['username']."</a>";
       echo '&nbsp;&nbsp;&nbsp;<a href="" onclick="logout()" id="log_out" name="log_out">退出登录</a>';
-     
+
     }else{
       echo '<a href="newfang_user_admin.php">点此登录</a>';
     }
@@ -206,14 +207,14 @@ $id=mysqli_fetch_assoc($id_set);
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0"  >
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215"><a href="../addnews/hushi2014112901.php">我的收藏</a></td>
+          <td width="215"><a href="newfang_collection.php" target="blank">我的收藏</a></td>
         </tr>
 </tbody></table>
 
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0"  tppabs="images/line.gif">
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215"><a href="../addnews/hushi2014112902.php">发帖记录</a></td>
+          <td width="215"><a href="newfang_record.php" target="blank">发帖记录</a></td>
         </tr>
 </tbody></table>
 
@@ -430,6 +431,8 @@ swfobject.registerObject("FlashID");
 function logout(){
  
   alert("已退出登录!");
+    //window.location.href=<?php echo 'logout.php'; ?>;
+
   window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?action=logout"'; ?>;
 }
 </script>
