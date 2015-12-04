@@ -1,5 +1,10 @@
 <?php require_once('Connections/connect.php'); ?>
 <?php
+mysqli_query($connect,"set names 'GBK'");
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
@@ -30,8 +35,22 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
   return $theValue;
 }
 }
+if (!isset($_SESSION)) {
+  session_start();
+}
 
-
+//用户登出
+if(isset($_GET['action'])){
+  if($_GET['action']=='logout'){
+    session_unset();
+    session_destroy();
+  }
+}
+//user_info
+mysqli_select_db( $connect,$database_connect);
+$info_quest=sprintf("SELECT * FROM admin  WHERE id='".$_SESSION['MM_UserGroup']['id']."'");
+$info_set = mysqli_query($connect,$info_quest) or die(mysql_error());
+$info=mysqli_fetch_assoc($info_set);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -82,7 +101,15 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
   <table width="25%" border="0" cellspacing="0" cellpadding="0">
     <tbody><tr>     
      
-     
+          <?php
+    if(!empty($_SESSION)){
+      echo '<a href="newfang_userhome.php">';
+      echo "您好".$_SESSION['MM_Username']."</a>";
+      echo '&nbsp;&nbsp;&nbsp;<a href="" onclick="logout()" id="log_out" name="log_out">退出登录</a>';
+    }else{
+      echo '<a href="newfang_user_admin.php">点此登录</a>';
+    }
+?>
 
     
     
@@ -267,29 +294,29 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
       </tr>
       <tr>
         <td align="center">　　　
-          <form id="form1" name="form1" method="post" action="">
+          <form id="form1" name="form1" method="post" action="<?php echo $editFormAction; ?>" onsubmit="MM_validateForm('username','','R','password','','R','password1','','R','truename','','R','tel','','RisNum','email','','RisEmail','question','','R','answer','','R','sex','','R');return document.MM_returnValue">
             <p>修改密码：　　
-              <input type="text" name="textfield" id="textfield" />
+              <input type="password" name="textfield" id="textfield" value=<?php echo $info['password']; ?> />
               <br />
               <br />
               再次输入：　　
-              <input type="text" name="textfield2" id="textfield2" />
+              <input type="password" name="textfield2" id="textfield2" value=<?php echo $info['password']; ?> />
               <label for="textfield2"></label>
             </p>
             <p>电子邮件：　　
-              <input type="text" name="textfield3" id="textfield3" />
+              <input type="text" name="textfield3" id="textfield3" value=<?php echo $info['email']; ?> />
             </p>
             <p>
               <label for="textfield4">姓名：　　　　</label>
-              <input type="text" name="textfield4" id="textfield4" />
+              <input type="text" name="textfield4" id="textfield4" value=<?php echo $info['truename']; ?> />
             </p>
             <p>
               <label for="textfield5">联系电话：　　</label>
-              <input type="text" name="textfield5" id="textfield5" />
+              <input type="text" name="textfield5" id="textfield5" value=<?php echo $info['tel']; ?> />
             </p>
             <p>
               <label for="textfield6">密码找回问题：</label>
-              <input type="text" name="textfield6" id="textfield6" />
+              <input type="text" name="textfield6" id="textfield6" value=<?php echo $info['question']; ?> >
             </p>
             <p>
               <input type="submit" name="button" id="button" value="提交" />　　
@@ -346,28 +373,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
   </tr>
 </tbody></table>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0039)http://thechoose.phpnet.us/xhdt.asp.htm -->
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
 
-<title>个人留学直通车</title>
-<meta name="keywords" content="中日人才交流援助平台">
-<meta name="MSSmartTagsPreventParsing" content="TRUE">
-<meta name="description" content="中日人才交流援助平台">
-<meta http-equiv="Page-Exit" content="revealTrans(Duration=1,Transition=23)">
-<meta http-equiv="Page-Enter" content="revealTrans(Duration=1,Transition=23)">
-<link rel="shortcut icon" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-<link rel="Bookmark" href="http://thechoose.phpnet.us/images/favicon.ico" type="image/x-icon">
-<link href="../images1/css.css" tppabs="css/css.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="../images1/swfobject.js" tppabs="fl/swfobject.js">
-</script>
-    <style type="text/css"></style>
-<script src="../images1/js.js" tppabs="js/js.js" type="text/javascript">
-</script>
-
-
-</head>
-<body>
 
 
 <table width="1000" height="47" border="0" align="center" cellpadding="0" cellspacing="0" 
@@ -431,6 +437,13 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
  </td>
   </tr>
 </tbody></table>
+<script type="text/javascript">
+function logout(){
+
+  alert("已退出登录!");
+    window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?action=logout"'; ?>;
+}
+</script>
 </body></html>
 <?php
 mysql_free_result($Recordset1);

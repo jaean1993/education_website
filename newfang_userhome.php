@@ -199,19 +199,9 @@ $id=mysqli_fetch_assoc($id_set);
         </tr>
 </tbody></table>
 
-<table width="232" border="0" align="center" cellpadding="0" cellspacing="0" >
-        <tbody><tr>
-          <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215"><a href="../addnews/hushi2014112903.php">.我的好友</a></td>
-        </tr>
-</tbody></table>
 
-<table width="232" border="0" align="center" cellpadding="0" cellspacing="0">
-        <tbody><tr>
-          <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215">我的提问</td>
-        </tr>
-</tbody></table>
+
+
 
 
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0" >

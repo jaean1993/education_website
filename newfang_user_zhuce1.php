@@ -34,7 +34,33 @@ $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
+$warning = array();
+
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
+  //check in server
+  if(strlen($_POST['username'])<6){
+    $warning['user']="用户名长度不少于6个字符！";
+    
+  }
+  if(strlen($_POST['password'])<6){
+    $warning['pass']="密码长度不少于6个字符！";
+    
+  }
+  if($_POST['password']!=$_POST['password1']){
+    $warning['pass']="两次密码不一致！";
+   
+  }
+  if(!preg_match("/^13[0-9]{1}[0-9]{8}$|15[0189]{1}[0-9]{8}$|18[0-9]{9}$/",$_POST['tel'])){    
+      $warning['tel']="无效的手机号格式！";
+       
+  }
+  $regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
+  if(!preg_match($regex, $_POST['email'])){
+    $warning['email']="无效的电子邮箱格式！";
+    
+  }
+
+  if(empty($warning)){
   $pass=base64_encode($_POST['password']);
   $insertSQL = sprintf("INSERT INTO `admin` (username, password, truename, tel, email, question, answer, sex,authority) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%d)",
                        GetSQLValueString($_POST['username'], "text",$connect),
@@ -58,7 +84,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
     $insertGoTo .= $_SERVER['QUERY_STRING'];
   }
   header(sprintf("Location: %s", $insertGoTo));
-}
+}}
 
 
 
@@ -108,55 +134,7 @@ $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 <script type="text/javascript" charset="utf-8" src="../images1/ueditor/lang/zh-cn/zh-cn.js"></script>
 
-<script type="text/javascript">
 
-<!--
-
-function MM_validateForm() { //v4.0
-
-  if (document.getElementById){
-
-    var i,p,q,nm,test,num,min,max,errors='',args=MM_validateForm.arguments;
-
-	val=document.getElementById(args[3]);val1=document.getElementById(args[6]);
-
-	if(val.value!=val1.value){nm=val.name;errors += '- '+nm+'两次密码输入不一致\n';}
-
-    for (i=0; i<(args.length-2); i+=3) { test=args[i+2]; val=document.getElementById(args[i]);
-
-      if (val) { nm=val.name; if ((val=val.value)!="") {
-
-        if (test.indexOf('isEmail')!=-1) { p=val.indexOf('@');
-
-          if (p<1 || p==(val.length-1)) errors+='- '+nm+' 邮箱格式不正确.\n';
-
-        } else if (test!='R') { num = parseFloat(val);
-
-          if (isNaN(val)) errors+='- '+nm+' 必须为数字.\n';
-
-          if (test.indexOf('inRange') != -1) { p=test.indexOf(':');
-
-            min=test.substring(8,p); max=test.substring(p+1);
-
-            if (num<min || max<num) errors+='- '+nm+' must contain a number between '+min+' and '+max+'.\n';
-
-      } } } else if (test.charAt(0) == 'R') errors += '- '+nm+' is required.\n'; }
-
-    }
-
-	
-
-	 if (errors) alert('The following error(s) occurred:\n'+errors);
-
-	  
-
-    document.MM_returnValue = (errors == '');
-
-} }
-
-//-->
-
-</script>
 
 
 
@@ -562,7 +540,7 @@ function MM_validateForm() { //v4.0
 
       <tr>
 
-        <td><form action="<?php echo $editFormAction; ?>" method="POST" name="form1" id="form1" onsubmit="MM_validateForm('username','','R','password','','R','password1','','R','truename','','R','tel','','RisNum','email','','RisEmail','question','','R','answer','','R','sex','','R');return document.MM_returnValue">
+        <td><form action="<?php echo $editFormAction; ?>" method="POST" name="form1" id="form1" >
 
   <table width="781" height="423" border="0">
 
@@ -574,13 +552,13 @@ function MM_validateForm() { //v4.0
 
     <tr>
 
-      <td bgcolor="#FFFFFF">用户名</td>
+      <td style="width: 30%;" bgcolor="#FFFFFF">用户名</td>
 
       <td><label>
 
-        <input type="text" name="username" id="username" />
+        <input type="text" name="username" id="username" placeholder="用户名长度不少于6个字符" />
 
-      </label></td>
+      </label></td><td ><span style="color:red"><?php if(isset($warning['user'])){echo $warning['user'];}?></span></td>
 
     </tr>
 
@@ -590,10 +568,9 @@ function MM_validateForm() { //v4.0
 
       <td><label>
 
-        <input type="text" name="password" id="password" />
+        <input type="password" name="password" id="password" placeholder="密码长度不少于6个字符" />
 
-      </label></td>
-
+       </label></td><td><span style="color:red"><?php if(isset($warning['pass'])){echo $warning['pass'];}?></span></td>
     </tr>
 
     <tr>
@@ -602,7 +579,7 @@ function MM_validateForm() { //v4.0
 
       <td><label>
 
-        <input type="text" name="password1" id="password1" />
+        <input type="password" name="password1" id="password1" />
 
       </label></td>
 
@@ -626,9 +603,9 @@ function MM_validateForm() { //v4.0
 
       <td><label>
 
-        <input type="text" name="tel" id="tel" />
+        <input type="text" name="tel" id="tel"  />
 
-      </label></td>
+        </label></td><td><span style="color:red"><?php if(isset($warning['tel'])){echo $warning['tel'];}?></span></td>
 
     </tr>
 
@@ -644,7 +621,7 @@ function MM_validateForm() { //v4.0
 
         <input type="text" name="email" id="email" />
 
-      </label></td>
+        </label></td><td><span style="color:red"><?php if(isset($warning['email'])){echo $warning['email'];}?></span></td>
 
     </tr>
 
@@ -668,8 +645,8 @@ function MM_validateForm() { //v4.0
 
       <td bgcolor="#FFFFFF">性别</td>
 
-      <td><input type="text" name="sex" id="sex" /></td>
-
+      <td><input type="radio" name="sex"  value="0" />男
+      <input type="radio" name="sex"  value="1" />女</td>
     </tr>
     
     <tr bgcolor="#FFFFFF">

@@ -38,6 +38,9 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
+if(isset($_SESSION['MM_Username'])){
+   header("Location: newfang_userhome.php" );
+}
 $loginFormAction = $_SERVER['PHP_SELF'];
 /*if (isset($_GET['accesscheck'])) {
   $_SESSION['PrevUrl'] = $_GET['accesscheck'];
