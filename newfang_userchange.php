@@ -1,18 +1,18 @@
 <?php require_once('Connections/connect.php'); ?>
 <?php
+
 mysqli_query($connect,"set names 'GBK'");
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
 if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($theValue, $theType, $connect,$theDefinedValue = "", $theNotDefinedValue = "") 
 {
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
+
+  $theValue = function_exists("mysql_real_escape_string") ? mysqli_real_escape_string($connect,$theValue) : mysqli_escape_string($connect,$theValue);
 
   switch ($theType) {
     case "text":
@@ -23,7 +23,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
       $theValue = ($theValue != "") ? intval($theValue) : "NULL";
       break;
     case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
+      $theValue = ($theValue != "") ? "'" . doubleval($theValue) . "'" : "NULL";
       break;
     case "date":
       $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
@@ -45,6 +45,51 @@ if(isset($_GET['action'])){
     session_unset();
     session_destroy();
   }
+}
+
+
+
+$Result1=false;
+$warning = array();
+
+if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
+  //check in server
+
+  if(strlen($_POST['password'])<6){
+    $warning['pass']="密码长度不少于6个字符！";
+    
+  }
+  if($_POST['password']!=$_POST['password1']){
+    $warning['pass']="两次密码不一致！";
+   
+  }
+  if(!preg_match("/^13[0-9]{1}[0-9]{8}$|15[0189]{1}[0-9]{8}$|18[0-9]{9}$/",$_POST['tel'])){    
+      $warning['tel']="无效的手机号格式！";
+       
+  }
+  $regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
+  if(!preg_match($regex, $_POST['email'])){
+    $warning['email']="无效的电子邮箱格式！";
+    
+  }
+
+  if(empty($warning)){
+  $pass=base64_encode($_POST['password']);
+  $insertSQL = sprintf("INSERT INTO `admin` ( password, truename, tel, email, ) VALUES (%s, %s, %s, %s)",
+                       
+                       GetSQLValueString($pass, "text",$connect),
+                       GetSQLValueString($_POST['truename'], "text",$connect),
+                       GetSQLValueString($_POST['tel'], "text",$connect),
+                       GetSQLValueString($_POST['email'], "text",$connect)
+                       );
+ 
+  
+  mysqli_select_db($connect,$database_connect );
+  $Result1 = mysqli_query($connect,$insertSQL) or die(mysql_error());
+}
+}
+if($Result1!=false){
+
 }
 //user_info
 mysqli_select_db( $connect,$database_connect);
@@ -121,17 +166,16 @@ $info=mysqli_fetch_assoc($info_set);
 
   <td height="65" colspan="2" align="left" valign="middle">
     <ul class="nav clearfix">
-      <li class="nav-item"><a href="../index.php" tppabs="index.php">首页</a></li>
-      <li class="nav-item"><a href="../news.php" tppabs="xhdt.php">会员之家</a></li>
-      <li class="nav-item"><a href="../notice.php" tppabs="huiyuan.php">项目资料</a></li>
-      <li class="nav-item"><a href="./success.php" tppabs="report.php">人文交流</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="../dsj.php" tppabs="dsj.php">关于协会</a></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"></li>
-      <li class="nav-item"><a href="../contect.php" tppabs="../contect.php">联系我们</a></li>
+        <li class="nav-item"><a href="../index.php" >首页</a></li>
+
+      <li class="nav-item"><a href="newfang_user_admin.php" >会员之家</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=news" >新闻动态</a></li>
+
+      <li class="nav-item"><a href="newfang_list.php?news_type=academic" >学术活动</a></li>
+      <li class="nav-item"><a href="newfang_list.php?news_type=members">会员动态</a></li>
+
+      <li class="nav-item"><a href="../contect.php" >联系我们</a></li>
     </ul>
   </td>
 </tr>
@@ -294,31 +338,29 @@ $info=mysqli_fetch_assoc($info_set);
       </tr>
       <tr>
         <td align="center">　　　
-          <form id="form1" name="form1" method="post" action="<?php echo $editFormAction; ?>" onsubmit="MM_validateForm('username','','R','password','','R','password1','','R','truename','','R','tel','','RisNum','email','','RisEmail','question','','R','answer','','R','sex','','R');return document.MM_returnValue">
+          <form id="form1" name="form1" method="post" action="<?php echo $editFormAction; ?>" >
             <p>修改密码：　　
-              <input type="password" name="textfield" id="textfield" value=<?php echo $info['password']; ?> />
+              <input type="password" name="password" id="password" placeholder="密码长度不少于六位" value=<?php echo $info['password']; ?> /> <span style="color:red"><?php if(isset($warning['pass'])){echo $warning['pass'];}?></span>
               <br />
               <br />
               再次输入：　　
-              <input type="password" name="textfield2" id="textfield2" value=<?php echo $info['password']; ?> />
+              <input type="password" name="password1" id="password1" value=<?php echo $info['password']; ?> />
               <label for="textfield2"></label>
             </p>
             <p>电子邮件：　　
-              <input type="text" name="textfield3" id="textfield3" value=<?php echo $info['email']; ?> />
+              <input type="text" name="email" id="email" value=<?php echo $info['email']; ?> /><span style="color:red"><?php if(isset($warning['email'])){echo $warning['email'];}?></span>
             </p>
             <p>
               <label for="textfield4">姓名：　　　　</label>
-              <input type="text" name="textfield4" id="textfield4" value=<?php echo $info['truename']; ?> />
+              <input type="text" name="truename" id="truename" value=<?php echo $info['truename']; ?> />
             </p>
             <p>
               <label for="textfield5">联系电话：　　</label>
-              <input type="text" name="textfield5" id="textfield5" value=<?php echo $info['tel']; ?> />
+              <input type="text" name="tel" id="tel" value=<?php echo $info['tel']; ?> /><span style="color:red"><?php if(isset($warning['tel'])){echo $warning['tel'];}?></span>
             </p>
+           
             <p>
-              <label for="textfield6">密码找回问题：</label>
-              <input type="text" name="textfield6" id="textfield6" value=<?php echo $info['question']; ?> >
-            </p>
-            <p>
+               <input type="hidden" name="MM_insert" value="form1" />
               <input type="submit" name="button" id="button" value="提交" />　　
               <input type="reset" name="button2" id="button2" value="重置" />
             </p>

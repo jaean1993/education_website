@@ -1,17 +1,35 @@
 <?php require_once('Connections/connect.php'); ?>
 <?php
+mysqli_query($connect,"set names 'gbk'");
+mysqli_select_db( $connect,$database_connect);
 if (!isset($_SESSION)) {
   session_start();
 }
+$delete_set=False;
+$MM_redirectLoginFailed1="newfang_user_admin.php";
+$MM_redirectLoginFailed2="newfang_guanliyuandenglu.php";
 //用户登出
 if(isset($_GET['action'])){
   if($_GET['action']=='logout'){
     session_unset();
+    session_destroy();
+  }
+  if($_GET['action']=='cancle'){
+
+    $delete_quest=sprintf("DELETE FROM admin  WHERE username='".$_SESSION['MM_Username']."'");
+    $delete_set = mysqli_query($connect,$delete_quest) or die(mysql_error());
+    session_unset();
+    session_destroy();
+
   }
 }
 
-$MM_redirectLoginFailed1="newfang_user_admin.php";
-$MM_redirectLoginFailed2="newfang_guanliyuandenglu.php";
+if($delete_set!=False){
+    header("Location: ". $MM_redirectLoginFailed1 );
+
+}
+
+
 //防止直接登入
 if(!$_SESSION['MM_Username']||!$_SESSION['MM_UserGroup']){
   header("Location: ". $MM_redirectLoginFailed1 );
@@ -34,8 +52,7 @@ if(isAuthorized($_SESSION['MM_Username'],$_SESSION['MM_UserGroup'])){
 }
 
 //get data from the database of user's informaiton
-mysqli_query($connect,"set names 'gbk'");
-mysqli_select_db( $connect,$database_connect);
+
 $id_quest=sprintf("SELECT id,username FROM admin  WHERE username='".$_SESSION['MM_Username']."' AND password='".$_SESSION['MM_UserGroup']['password']."'");
 $id_set = mysqli_query($connect,$id_quest) or die(mysql_error());
 $id=mysqli_fetch_assoc($id_set);
@@ -59,10 +76,10 @@ $id=mysqli_fetch_assoc($id_set);
 <link href="../images1/css.css" tppabs="css/css.css" type="text/css" rel="stylesheet">
 <script type="text/javascript" src="../images1/swfobject.js" tppabs="fl/swfobject.js"></script><style type="text/css"></style>
 <script src="../images1/js.js" tppabs="js/js.js" type="text/javascript"></script>
-<script type="text/javascript" charset="utf-8" src="../images1/ueditor/ueditor.config.js"></script>
-    <script type="text/javascript" charset="utf-8" src="../images1/ueditor/ueditor.all.min.js"> </script>
+
 <script type="text/javascript" charset="utf-8" src="../images1/ueditor/lang/zh-cn/zh-cn.js"></script>
 <script src="Scripts/swfobject_modified.js" type="text/javascript"></script>
+
 </head>
     
 
@@ -98,6 +115,7 @@ $id=mysqli_fetch_assoc($id_set);
       echo '<a href="newfang_userhome.php">';
       echo "您好".$id['username']."</a>";
       echo '&nbsp;&nbsp;&nbsp;<a href="" onclick="logout()" id="log_out" name="log_out">退出登录</a>';
+     
     }else{
       echo '<a href="newfang_user_admin.php">点此登录</a>';
     }
@@ -181,21 +199,21 @@ $id=mysqli_fetch_assoc($id_set);
                <table width="231" border="0" align="center" cellpadding="0" cellspacing="0">
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="226"><a href="newfang_userchange.php">.修改个人资料</a></td>
+          <td width="226"><a href="newfang_userchange.php">修改个人资料</a></td>
         </tr>
 </tbody></table>
 
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0"  >
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215"><a href="../addnews/hushi2014112901.php">.我的收藏</a></td>
+          <td width="215"><a href="../addnews/hushi2014112901.php">我的收藏</a></td>
         </tr>
 </tbody></table>
 
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0"  tppabs="images/line.gif">
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215"><a href="../addnews/hushi2014112902.php">.发帖记录</a></td>
+          <td width="215"><a href="../addnews/hushi2014112902.php">发帖记录</a></td>
         </tr>
 </tbody></table>
 
@@ -207,7 +225,7 @@ $id=mysqli_fetch_assoc($id_set);
 <table width="232" border="0" align="center" cellpadding="0" cellspacing="0" >
         <tbody><tr>
           <td width="17" height="32" align="center"><img src="../images1/left.gif" tppabs="images/left.gif" width="5" height="9"></td>
-          <td width="215">注销账户</td>
+          <td width="215"><a href="javascript:if(confirm('确实要注销吗?'))location='http://localhost/newfang_userhome.php?action=cancle'">注销账户</a></td>
         </tr>
 </tbody></table>    
 
@@ -410,7 +428,7 @@ $id=mysqli_fetch_assoc($id_set);
 swfobject.registerObject("FlashID");
 
 function logout(){
-  console.log('123');
+ 
   alert("已退出登录!");
   window.location.href=<?php echo '"http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?action=logout"'; ?>;
 }
